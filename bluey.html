@@ -4,20 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fly The Copter</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
   <style>
-  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-  * { font-family: 'Press Start 2P', monospace; }
-  canvas { display: block; width: 100%; height: 100%; }
-</style>
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      height: 100%; 
+      overflow: hidden; 
+      font-family: 'Press Start 2P', monospace;
+    }
+    canvas { 
+      display: block; 
+      width: 100%; 
+      height: 100%; 
+    }
+  </style>
   <style>body { box-sizing: border-box; }</style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js" type="text/javascript"></script>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full bg-black">
-  <canvas id="game"></canvas>
+ <body class="h-full" style="background: #87CEEB;">
+  <canvas id="game" style="background: #87CEEB;"></canvas>
   <script>
 const defaultConfig = {
   game_title: "Bluey's Helicopter",
@@ -30,34 +39,15 @@ const defaultConfig = {
 
 let config = { ...defaultConfig };
 
-window.elementSdk.init({
-  defaultConfig,
-  onConfigChange: async (c) => {
-    config = { ...defaultConfig, ...c };
-  },
-  mapToCapabilities: (c) => ({
-    recolorables: [
-      { get: () => c.background_color || defaultConfig.background_color, set: v => { c.background_color = v; window.elementSdk.setConfig({ background_color: v }); }},
-      { get: () => c.surface_color || defaultConfig.surface_color, set: v => { c.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); }},
-      { get: () => c.text_color || defaultConfig.text_color, set: v => { c.text_color = v; window.elementSdk.setConfig({ text_color: v }); }},
-      { get: () => c.primary_action_color || defaultConfig.primary_action_color, set: v => { c.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); }},
-      { get: () => c.secondary_action_color || defaultConfig.secondary_action_color, set: v => { c.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); }}
-    ],
-    borderables: [],
-    fontEditable: undefined,
-    fontSizeable: undefined
-  }),
-  mapToEditPanelValues: (c) => new Map([["game_title", c.game_title || defaultConfig.game_title]])
-});
-
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
 let W, H;
 function resize() {
-  W = canvas.width = canvas.offsetWidth;
-  H = canvas.height = canvas.offsetHeight;
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
 }
+
 resize();
 window.addEventListener('resize', resize);
 
@@ -124,34 +114,104 @@ function drawHeli(x, y) {
   const c1 = config.primary_action_color;
   const c2 = config.secondary_action_color;
   ctx.save();
-  // Body
-  ctx.fillStyle = c1;
+  
+  // Helicopter body (simplified)
+  ctx.fillStyle = '#333333';
   ctx.beginPath();
-  ctx.ellipse(x, y, heli.w / 2, heli.h / 2, 0, 0, Math.PI * 2);
+  ctx.ellipse(x, y + 2, heli.w / 2 - 2, heli.h / 2 - 2, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Cockpit
-  ctx.fillStyle = c2;
+  
+  // Cockpit window
+  ctx.fillStyle = '#87CEEB';
   ctx.beginPath();
-  ctx.ellipse(x + 10, y - 2, 8, 7, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + 2, y, 7, 6, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Tail
-  ctx.fillStyle = c1;
-  ctx.fillRect(x - heli.w / 2 - 14, y - 3, 18, 6);
+  
+  // Tail boom
+  ctx.fillStyle = '#333333';
+  ctx.fillRect(x - heli.w / 2 - 12, y + 1, 16, 3);
+  
   // Tail rotor
-  ctx.fillStyle = c2;
-  const tailSpin = Math.sin(frameCount * 0.5) * 8;
-  ctx.fillRect(x - heli.w / 2 - 15, y - tailSpin, 3, tailSpin * 2);
-  // Main rotor
-  const rotorPhase = Math.sin(frameCount * 0.8);
-  ctx.strokeStyle = c2;
-  ctx.lineWidth = 2;
+  ctx.fillStyle = '#555555';
+  const tailSpin = Math.sin(frameCount * 0.5) * 6;
+  ctx.fillRect(x - heli.w / 2 - 14, y + 1 - tailSpin, 2, tailSpin * 2 + 2);
+  
+  // Main rotor blades
+  const rotorPhase = frameCount * 0.15;
+  ctx.strokeStyle = '#555555';
+  ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.moveTo(x - 26 * rotorPhase, y - heli.h / 2 - 4);
-  ctx.lineTo(x + 26 * rotorPhase, y - heli.h / 2 - 4);
+  ctx.moveTo(x - 22 * Math.cos(rotorPhase), y - 10 - 22 * Math.sin(rotorPhase));
+  ctx.lineTo(x + 22 * Math.cos(rotorPhase), y - 10 + 22 * Math.sin(rotorPhase));
   ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x - 22 * Math.cos(rotorPhase + Math.PI / 2), y - 10 - 22 * Math.sin(rotorPhase + Math.PI / 2));
+  ctx.lineTo(x + 22 * Math.cos(rotorPhase + Math.PI / 2), y - 10 + 22 * Math.sin(rotorPhase + Math.PI / 2));
+  ctx.stroke();
+  
   // Rotor mast
-  ctx.fillStyle = c1;
-  ctx.fillRect(x - 1.5, y - heli.h / 2 - 4, 3, 5);
+  ctx.fillStyle = '#444444';
+  ctx.fillRect(x - 2, y - 10, 4, 9);
+  
+  // Bluey character inside
+  // Head
+  ctx.fillStyle = '#0066CC';
+  ctx.beginPath();
+  ctx.ellipse(x + 2, y - 2, 5, 5.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Ears
+  ctx.fillStyle = '#0066CC';
+  ctx.beginPath();
+  ctx.ellipse(x - 2, y - 6, 2.5, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + 6, y - 6, 2.5, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Eyes
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.ellipse(x, y - 3, 1.5, 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + 4, y - 3, 1.5, 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Pupils
+  ctx.fillStyle = '#000000';
+  ctx.beginPath();
+  ctx.ellipse(x + 0.3, y - 2.5, 0.8, 1.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(x + 4.3, y - 2.5, 0.8, 1.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Snout
+  ctx.fillStyle = '#0052A3';
+  ctx.beginPath();
+  ctx.ellipse(x + 2, y + 1.5, 3.5, 2.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Nose
+  ctx.fillStyle = '#000000';
+  ctx.beginPath();
+  ctx.arc(x + 2, y + 0.5, 1.2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Happy mouth
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(x + 2, y + 1.5, 1.5, 0, Math.PI);
+  ctx.stroke();
+  
+  // Body (shirt)
+  ctx.fillStyle = '#FF6B35';
+  ctx.beginPath();
+  ctx.ellipse(x + 2, y + 4, 3, 2.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
   ctx.restore();
 }
 
@@ -363,7 +423,8 @@ function stopInput() { pressing = false; }
 document.addEventListener('keydown', e => { if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); startInput(); }});
 document.addEventListener('keyup', e => { if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); stopInput(); }});
 
+// Start the game loop
 loop();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e1d7ccbb35490c9',t:'MTc3NDQzNzIxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e1d93b307904177',t:'MTc3NDQzODE1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
