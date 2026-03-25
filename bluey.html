@@ -29,7 +29,7 @@
   <canvas id="game" style="background: #87CEEB;"></canvas>
   <script>
 const defaultConfig = {
-  game_title: "Erin's Bluey Helicopter game",
+  game_title: "Bluey's Helicopter",
   background_color: "#87CEEB",
   surface_color: "#FF6B9D",
   text_color: "#2C3E50",
@@ -423,8 +423,19 @@ function stopInput() { pressing = false; }
 document.addEventListener('keydown', e => { if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); startInput(); }});
 document.addEventListener('keyup', e => { if (e.code === 'Space' || e.key === ' ') { e.preventDefault(); stopInput(); }});
 
+// Mobile touch controls
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  startInput();
+});
+
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  stopInput();
+});
+
 // Start the game loop
 loop();
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e1d93b307904177',t:'MTc3NDQzODE1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e1d9b53573f4177',t:'MTc3NDQzODQ2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
